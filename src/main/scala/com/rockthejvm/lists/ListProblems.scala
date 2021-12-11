@@ -11,6 +11,7 @@ sealed abstract class RList[+T] {
 
   def apply(index: Int): T
   def length: Int
+  def reverse: RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -23,6 +24,8 @@ case object RNil extends RList[Nothing] {
   override def apply(index: Int) = throw new NoSuchElementException
 
   override def length: Int = 0
+
+  override def reverse: RList[Nothing] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -60,6 +63,16 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     lengthTailRec(this, 0);
   }
 
+  override def reverse: RList[T] = {
+    @tailrec
+    def reverseTailRec(remaining: RList[T], acc: RList[T]): RList[T] = {
+      if (remaining.isEmpty) acc
+      else reverseTailRec(remaining.tail, remaining.head :: acc)
+    }
+
+    reverseTailRec(this,  RNil)
+  }
+
 }
 
 object ListProblems extends App {
@@ -70,6 +83,11 @@ object ListProblems extends App {
   println(aSmallList(1))
   //println(aSmallList(5))
 
-  println("Length:")
-  println(aSmallList.length)
+
+  println("Reverse:")
+  println(RNil.reverse)
+  println((1 :: RNil).reverse)
+  println(aSmallList.reverse)
+
+
 }
