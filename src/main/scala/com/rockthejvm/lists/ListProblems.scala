@@ -10,6 +10,7 @@ sealed abstract class RList[+T] {
   def ::[S >: T](elem: S): RList[S] = new ::(elem, this)
 
   def apply(index: Int): T
+  def length: Int
 }
 
 case object RNil extends RList[Nothing] {
@@ -20,6 +21,8 @@ case object RNil extends RList[Nothing] {
   override def toString: String = "[]"
 
   override def apply(index: Int) = throw new NoSuchElementException
+
+  override def length: Int = 0
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -41,11 +44,21 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     @tailrec
     def applyTailRec(remaining: RList[T], remainingIndex: Int): T = {
       if (remainingIndex == 0) remaining.head
-      else applyTailRec(remaining.tail, remainingIndex -1)
+      else applyTailRec(remaining.tail, remainingIndex - 1)
     }
 
     applyTailRec(this, index)
   }
+
+  override def length: Int = {
+    def lengthTailRec(remaining: RList[T], acc: Int): Int = {
+      if (remaining.isEmpty) acc
+      else lengthTailRec(remaining.tail, acc + 1)
+    }
+
+    lengthTailRec(this, 0);
+  }
+
 }
 
 object ListProblems extends App {
@@ -54,5 +67,8 @@ object ListProblems extends App {
   println(aSmallList)
   println(aSmallList(0))
   println(aSmallList(1))
-  println(aSmallList(5))
+  //println(aSmallList(5))
+
+  println("Length:")
+  println(aSmallList.length)
 }
