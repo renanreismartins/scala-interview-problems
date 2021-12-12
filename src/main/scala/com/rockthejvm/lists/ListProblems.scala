@@ -90,6 +90,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
   }
 
   override def removeAt(index: Int): RList[T] = {
+    @tailrec
     def removeAtTailRec(remaining: RList[T], index: Int, acc: RList[T]): RList[T] = {
       if (remaining.isEmpty) acc.reverse
       else if (index == 0) acc.reverse ++ remaining.tail
