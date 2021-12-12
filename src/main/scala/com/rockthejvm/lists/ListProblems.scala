@@ -13,6 +13,7 @@ sealed abstract class RList[+T] {
   def length: Int
   def reverse: RList[T]
   def ++[S >: T](anotherList: RList[S]): RList[S]
+  def removeAt(index: Int): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -29,6 +30,8 @@ case object RNil extends RList[Nothing] {
   override def reverse: RList[Nothing] = this
 
   override def ++[S >: Nothing](anotherList: RList[S]): RList[S] = anotherList
+
+  override def removeAt(index: Int): RList[Nothing] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -85,6 +88,15 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     concatTailRec(this.reverse, anotherList)
   }
+
+  override def removeAt(index: Int): RList[T] = {
+    def removeAtTailRec(remaining: RList[T], index: Int, acc: RList[T]): RList[T] = {
+      if (index == 0) acc ++ remaining.tail
+      else removeAtTailRec(remaining.tail, index - 1, remaining.head :: acc)
+    }
+
+    removeAtTailRec(this, index, RNil).reverse
+  }
 }
 
 object ListProblems extends App {
@@ -103,5 +115,12 @@ object ListProblems extends App {
   println("Concat:")
   println(RNil ++ aSmallList)
   println(aSmallList ++ (4 :: 5 :: RNil))
+
+  println("Remove at:")
+  println(RNil.removeAt(2))
+  println((1 :: RNil).removeAt(0))
+  println((1 :: 2 :: RNil).removeAt(0))
+  println((1 :: 2 :: RNil).removeAt(1))
+  println(aSmallList.removeAt(2))
 
 }
