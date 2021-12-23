@@ -121,6 +121,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
   }
 
   override def map[S](f: T => S): RList[S] = {
+    @tailrec
     def mapTailRec(remaining: RList[T], acc: RList[S]): RList[S] =
       if (remaining.isEmpty) acc
       else mapTailRec(remaining.tail, f(remaining.head) :: acc)
@@ -129,6 +130,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
   }
 
   override def flatMap[S](f: T => RList[S]): RList[S] = {
+    @tailrec
     def flatMapTailRec(remaining: RList[T], acc: RList[S]): RList[S] = {
       if (remaining.isEmpty) acc
       else flatMapTailRec(remaining.tail, f(remaining.head) ++ acc)
@@ -138,6 +140,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
   }
 
   override def filter(f: T => Boolean): RList[T] = {
+    @tailrec
     def filterTailRec(remaining: RList[T], acc: RList[T]): RList[T] =
       if (remaining.isEmpty) acc
       else filterTailRec(remaining.tail, if (f(remaining.head)) remaining.head :: acc else acc)
