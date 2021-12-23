@@ -26,6 +26,8 @@ sealed abstract class RList[+T] {
   def flatMap[S](f: T => RList[S]): RList[S]
 
   def filter(f: T => Boolean): RList[T]
+
+  def rle: RList[(T, Int)]
 }
 
 case object RNil extends RList[Nothing] {
@@ -52,6 +54,8 @@ case object RNil extends RList[Nothing] {
   override def flatMap[S](f: Nothing => RList[S]): RList[S] = this
 
   override def filter(f: Nothing => Boolean): RList[Nothing] = this
+
+  override def rle: RList[(Nothing, Int)] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -147,6 +151,16 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     filterTailRec(this, RNil).reverse
   }
+
+  override def rle: RList[(T, Int)] = {
+    @tailrec
+    def rleTailRec(remaining: RList[T], acc: Map[T, Int]): Map[T, Int] = {
+      if (remaining.isEmpty) acc
+      else rleTailRec(remaining.tail, acc.updated(remaining.head, acc.getOrElse(remaining.head, 0) + 1))
+    }
+
+    rleTailRec(this.reverse, Map()).foldLeft(RNil: RList[(T, Int)])((list, tuple) => tuple :: list)
+  }
 }
 
 object ListProblems extends App {
@@ -182,4 +196,7 @@ object ListProblems extends App {
 
   println("filter:")
   println(aSmallList.filter(_ > 1))
+
+  println("rle:")
+  println(aSmallList.rle)
 }
