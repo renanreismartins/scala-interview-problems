@@ -161,6 +161,18 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     rleTailRec(this.reverse, Map()).foldLeft(RNil: RList[(T, Int)])((list, tuple) => tuple :: list)
   }
+
+  def rleNoMap: RList[(T, Int)] = {
+    @tailrec
+    def rleTailRec(remaining: RList[T], currentTuple: (T, Int), acc: RList[(T, Int)]): RList[(T, Int)] = {
+      if (remaining.isEmpty) currentTuple :: acc
+      else if (currentTuple._1 == remaining.head) rleTailRec(remaining.tail, (currentTuple._1, currentTuple._2 + 1), acc)
+      else rleTailRec(remaining.tail, (remaining.head, 1), currentTuple :: acc)
+    }
+
+    val reversed = this.reverse
+    rleTailRec(reversed, (reversed.head, 0), RNil)
+  }
 }
 
 object ListProblems extends App {
@@ -198,5 +210,8 @@ object ListProblems extends App {
   println(aSmallList.filter(_ > 1))
 
   println("rle:")
-  println(aSmallList.rle)
+  println(("a" :: "b" :: "b" :: "c" :: RNil).rle)
+
+  println("rleNoMap:")
+  println(("a" :: "b" :: "b" :: "c" :: RNil).asInstanceOf[::[(String, Int)]].rleNoMap)
 }
