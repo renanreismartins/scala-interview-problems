@@ -170,8 +170,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       else rleTailRec(remaining.tail, (remaining.head, 1), currentTuple :: acc)
     }
 
-    val reversed = this.reverse
-    rleTailRec(reversed.tail, (reversed.head, 1), RNil)
+    rleTailRec(this.tail, (this.head, 1), RNil).reverse
   }
 }
 
