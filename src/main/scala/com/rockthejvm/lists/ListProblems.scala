@@ -4,21 +4,35 @@ import scala.annotation.tailrec
 
 sealed abstract class RList[+T] {
   def head: T
+
   def tail: RList[T]
+
   def isEmpty: Boolean
 
   def ::[S >: T](elem: S): RList[S] = new ::(elem, this)
 
   def apply(index: Int): T
+
   def length: Int
+
   def reverse: RList[T]
+
   def ++[S >: T](anotherList: RList[S]): RList[S]
+
   def removeAt(index: Int): RList[T]
+
+  def map[S](f: T => S): RList[S]
+
+  def flatMap[S](f: T => RList[S]): RList[S]
+
+  def filter(f: T => Boolean): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
   override def head: Nothing = throw new NoSuchElementException
+
   override def tail: RList[Nothing] = throw new NoSuchElementException
+
   override def isEmpty: Boolean = true
 
   override def toString: String = "[]"
@@ -32,6 +46,12 @@ case object RNil extends RList[Nothing] {
   override def ++[S >: Nothing](anotherList: RList[S]): RList[S] = anotherList
 
   override def removeAt(index: Int): RList[Nothing] = this
+
+  override def map[S](f: Nothing => S): RList[S] = this
+
+  override def flatMap[S](f: Nothing => RList[S]): RList[S] = this
+
+  override def filter(f: Nothing => Boolean): RList[Nothing] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -76,7 +96,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       else reverseTailRec(remaining.tail, remaining.head :: acc)
     }
 
-    reverseTailRec(this,  RNil)
+    reverseTailRec(this, RNil)
   }
 
   override def ++[S >: T](anotherList: RList[S]): RList[S] = {
@@ -98,6 +118,31 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     }
 
     removeAtTailRec(this, index, RNil)
+  }
+
+  override def map[S](f: T => S): RList[S] = {
+    def mapTailRec(remaining: RList[T], acc: RList[S]): RList[S] =
+      if (remaining.isEmpty) acc
+      else mapTailRec(remaining.tail, f(remaining.head) :: acc)
+
+    mapTailRec(this, RNil).reverse
+  }
+
+  override def flatMap[S](f: T => RList[S]): RList[S] = {
+    def flatMapTailRec(remaining: RList[T], acc: RList[S]): RList[S] = {
+      if (remaining.isEmpty) acc
+      else flatMapTailRec(remaining.tail, f(remaining.head) ++ acc)
+    }
+
+    flatMapTailRec(this, RNil).reverse
+  }
+
+  override def filter(f: T => Boolean): RList[T] = {
+    def filterTailRec(remaining: RList[T], acc: RList[T]): RList[T] =
+      if (remaining.isEmpty) acc
+      else filterTailRec(remaining.tail, if (f(remaining.head)) remaining.head :: acc else acc)
+
+    filterTailRec(this, RNil).reverse
   }
 }
 
@@ -126,4 +171,12 @@ object ListProblems extends App {
   println((1 :: 2 :: 3 :: 4 :: 5 :: RNil).removeAt(2))
   println((1 :: 2 :: 3 :: 4 :: 5 :: RNil).removeAt(9))
 
+  println("map:")
+  println(aSmallList.map(_ * 2))
+
+  println("flatMap:")
+  println(aSmallList.flatMap(e => e :: e :: RNil))
+
+  println("filter:")
+  println(aSmallList.filter(_ > 1))
 }
