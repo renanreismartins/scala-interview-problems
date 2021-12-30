@@ -224,12 +224,12 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
   override def sample(n: Int): RList[T] = {
     @tailrec
-    def sampleTailRec(remaining: RList[T], remainingN: Int, acc: RList[T]): RList[T] = {
-      if (remainingN == 0 || remaining.isEmpty) acc.reverse
-      else sampleTailRec(remaining.tail, remainingN - 1, remaining(new Random().nextInt(remaining.length)) :: acc)
+    def sampleTailRec(remainingN: Int, acc: RList[T]): RList[T] = {
+      if (remainingN == 0) acc.reverse
+      else sampleTailRec( remainingN - 1, this(new Random().nextInt(this.length)) :: acc)
     }
 
-    sampleTailRec(this, n, RNil)
+    sampleTailRec(n, RNil)
   }
 }
 
