@@ -33,7 +33,7 @@ sealed abstract class RList[+T] {
 
   def splitAt(n: Int): RList[T]
 
-  def take(n: Int): RList[T]
+  def rotate(n: Int): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -67,7 +67,7 @@ case object RNil extends RList[Nothing] {
 
   override def splitAt(n: Int): RList[Nothing] = this
 
-  override def take(n: Int): RList[Nothing] = this
+  override def rotate(n: Int): RList[Nothing] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -206,15 +206,15 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     splitTailRec(this, n)
   }
 
-  override def take(n: Int): RList[T] = {
+  override def rotate(n: Int): RList[T] = {
     @tailrec
-    def takeTailRec(remaining: RList[T], remainingN: Int, acc: RList[T]): RList[T] = {
+    def rotateTailRec(remaining: RList[T], remainingN: Int, acc: RList[T]): RList[T] = {
       if (remainingN == 0) remaining ++ acc.reverse
-      else if (remaining.isEmpty) takeTailRec(this, remainingN, RNil)
-      else takeTailRec(remaining.tail, remainingN - 1, remaining.head :: acc)
+      else if (remaining.isEmpty) rotateTailRec(this, remainingN, RNil)
+      else rotateTailRec(remaining.tail, remainingN - 1, remaining.head :: acc)
     }
 
-    takeTailRec(this, n, RNil)
+    rotateTailRec(this, n, RNil)
   }
 }
 
@@ -271,13 +271,13 @@ object ListProblems extends App {
   println(("a" :: "b" :: "c" :: RNil).splitAt(2))
   println(("a" :: "b" :: "c" :: RNil).splitAt(5))
 
-  println("take:")
-  println(("a" :: RNil).take(2))
-  println(("a" :: "b" :: "c" :: RNil).take(0))
-  println(("a" :: "b" :: "c" :: RNil).take(1))
-  println(("a" :: "b" :: "c" :: RNil).take(2))
-  println(("a" :: "b" :: "c" :: RNil).take(3))
-  println(("a" :: "b" :: "c" :: RNil).take(4))
+  println("rotate:")
+  println(("a" :: RNil).rotate(2))
+  println(("a" :: "b" :: "c" :: RNil).rotate(0))
+  println(("a" :: "b" :: "c" :: RNil).rotate(1))
+  println(("a" :: "b" :: "c" :: RNil).rotate(2))
+  println(("a" :: "b" :: "c" :: RNil).rotate(3))
+  println(("a" :: "b" :: "c" :: RNil).rotate(4))
 
 
 }
