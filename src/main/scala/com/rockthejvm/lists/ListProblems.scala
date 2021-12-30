@@ -30,6 +30,10 @@ sealed abstract class RList[+T] {
   def rle: RList[(T, Int)]
 
   def duplicateEach(k: Int): RList[T]
+
+  def splitAt(n: Int): RList[T]
+
+  def take(n: Int): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -60,6 +64,10 @@ case object RNil extends RList[Nothing] {
   override def rle: RList[(Nothing, Int)] = this
 
   override def duplicateEach(k: Int): RList[Nothing] = this
+
+  override def splitAt(n: Int): RList[Nothing] = this
+
+  override def take(n: Int): RList[Nothing] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -187,6 +195,27 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     duplicateEachTailRec(this.reverse, k, RNil)
   }
+
+  override def splitAt(n: Int): RList[T] = {
+    @tailrec
+    def splitTailRec(remaining: RList[T], remainingN: Int): RList[T] = {
+      if (remainingN == 0 || remaining.isEmpty) remaining
+      else splitTailRec(remaining.tail, remainingN - 1)
+    }
+
+    splitTailRec(this, n)
+  }
+
+  override def take(n: Int): RList[T] = {
+    @tailrec
+    def takeTailRec(remaining: RList[T], remainingN: Int, acc: RList[T]): RList[T] = {
+      if (remainingN == 0) remaining ++ acc.reverse
+      else if (remaining.isEmpty) takeTailRec(this, remainingN, RNil)
+      else takeTailRec(remaining.tail, remainingN - 1, remaining.head :: acc)
+    }
+
+    takeTailRec(this, n, RNil)
+  }
 }
 
 object ListProblems extends App {
@@ -233,6 +262,22 @@ object ListProblems extends App {
   println(("a" :: RNil).duplicateEach(1))
   println(("a" :: RNil).duplicateEach(2))
   println(("a" :: RNil).duplicateEach(3))
-  println(("a" :: "b"  :: RNil).duplicateEach(4))
-//  println(("a" :: "b" :: RNil).duplicateEach(2))
+  println(("a" :: "b" :: RNil).duplicateEach(4))
+  //  println(("a" :: "b" :: RNil).duplicateEach(2))
+
+  println("splitAt:")
+  println(("a" :: "b" :: "c" :: RNil).splitAt(0))
+  println(("a" :: "b" :: "c" :: RNil).splitAt(1))
+  println(("a" :: "b" :: "c" :: RNil).splitAt(2))
+  println(("a" :: "b" :: "c" :: RNil).splitAt(5))
+
+  println("take:")
+  println(("a" :: RNil).take(2))
+  println(("a" :: "b" :: "c" :: RNil).take(0))
+  println(("a" :: "b" :: "c" :: RNil).take(1))
+  println(("a" :: "b" :: "c" :: RNil).take(2))
+  println(("a" :: "b" :: "c" :: RNil).take(3))
+  println(("a" :: "b" :: "c" :: RNil).take(4))
+
+
 }
