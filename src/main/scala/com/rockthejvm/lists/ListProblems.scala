@@ -1,6 +1,7 @@
 package com.rockthejvm.lists
 
 import scala.annotation.tailrec
+import scala.util.Random
 
 sealed abstract class RList[+T] {
   def head: T
@@ -34,6 +35,8 @@ sealed abstract class RList[+T] {
   def splitAt(n: Int): RList[T]
 
   def rotate(n: Int): RList[T]
+
+  def sample(n: Int): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -68,6 +71,8 @@ case object RNil extends RList[Nothing] {
   override def splitAt(n: Int): RList[Nothing] = this
 
   override def rotate(n: Int): RList[Nothing] = this
+
+  override def sample(n: Int): RList[Nothing] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -216,6 +221,16 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     rotateTailRec(this, n, RNil)
   }
+
+  override def sample(n: Int): RList[T] = {
+    @tailrec
+    def sampleTailRec(remaining: RList[T], remainingN: Int, acc: RList[T]): RList[T] = {
+      if (remainingN == 0 || remaining.isEmpty) acc.reverse
+      else sampleTailRec(remaining.tail, remainingN - 1, remaining(new Random().nextInt(remaining.length)) :: acc)
+    }
+
+    sampleTailRec(this, n, RNil)
+  }
 }
 
 object ListProblems extends App {
@@ -278,6 +293,10 @@ object ListProblems extends App {
   println(("a" :: "b" :: "c" :: RNil).rotate(2))
   println(("a" :: "b" :: "c" :: RNil).rotate(3))
   println(("a" :: "b" :: "c" :: RNil).rotate(4))
+
+  println("sample:")
+  println(aSmallList.sample(3))
+
 
 
 }
