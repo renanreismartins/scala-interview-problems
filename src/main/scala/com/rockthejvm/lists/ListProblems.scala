@@ -28,6 +28,8 @@ sealed abstract class RList[+T] {
   def filter(f: T => Boolean): RList[T]
 
   def rle: RList[(T, Int)]
+
+  def duplicateEach(k: Int): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -56,6 +58,8 @@ case object RNil extends RList[Nothing] {
   override def filter(f: Nothing => Boolean): RList[Nothing] = this
 
   override def rle: RList[(Nothing, Int)] = this
+
+  override def duplicateEach(k: Int): RList[Nothing] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -172,6 +176,17 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     rleTailRec(this.tail, (this.head, 1), RNil).reverse
   }
+
+  override def duplicateEach(k: Int): RList[T] = {
+    @tailrec
+    def duplicateEachTailRec(remaining: RList[T], remainingK: Int, acc: RList[T]): RList[T] = {
+      if (remaining.isEmpty) acc
+      else if (remainingK == 0) duplicateEachTailRec(remaining.tail, k, acc)
+      else duplicateEachTailRec(remaining, remainingK - 1, remaining.head :: acc)
+    }
+
+    duplicateEachTailRec(this.reverse, k, RNil)
+  }
 }
 
 object ListProblems extends App {
@@ -213,4 +228,11 @@ object ListProblems extends App {
 
   println("rleNoMap:")
   println(("a" :: "b" :: "b" :: "c" :: RNil).asInstanceOf[::[(String, Int)]].rleNoMap)
+
+  println("duplicateEach:")
+  println(("a" :: RNil).duplicateEach(1))
+  println(("a" :: RNil).duplicateEach(2))
+  println(("a" :: RNil).duplicateEach(3))
+  println(("a" :: "b"  :: RNil).duplicateEach(4))
+//  println(("a" :: "b" :: RNil).duplicateEach(2))
 }
