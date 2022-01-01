@@ -154,7 +154,7 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     @tailrec
     def flatMapTailRec(remaining: RList[T], acc: RList[S]): RList[S] = {
       if (remaining.isEmpty) acc
-      else flatMapTailRec(remaining.tail, f(remaining.head) ++ acc)
+      else flatMapTailRec(remaining.tail, f(remaining.head).reverse ++ acc)
     }
 
     flatMapTailRec(this, RNil).reverse
@@ -262,7 +262,7 @@ object ListProblems extends App {
   println(aSmallList.map(_ * 2))
 
   println("flatMap:")
-  println(aSmallList.flatMap(e => e :: e :: RNil))
+  println(aSmallList.flatMap(e => e :: e * 2 :: RNil))
 
   println("filter:")
   println(aSmallList.filter(_ > 1))
