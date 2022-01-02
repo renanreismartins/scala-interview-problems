@@ -37,6 +37,8 @@ sealed abstract class RList[+T] {
   def rotate(n: Int): RList[T]
 
   def sample(n: Int): RList[T]
+
+  def sorted[S >: T](ordering: Ordering[S]): RList[S]
 }
 
 case object RNil extends RList[Nothing] {
@@ -73,6 +75,8 @@ case object RNil extends RList[Nothing] {
   override def rotate(n: Int): RList[Nothing] = this
 
   override def sample(n: Int): RList[Nothing] = this
+
+  override def sorted[S >: Nothing](ordering: Ordering[S]): RList[S] = this
 }
 
 case class ::[+T](override val head: T, override val tail: RList[T]) extends RList[T] {
@@ -231,6 +235,23 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 
     sampleTailRec(n, RNil)
   }
+
+  override def sorted[S >: T](ordering: Ordering[S]): RList[S] = {
+    @tailrec
+    def insertSorted(element: T, remaining: RList[S], acc: RList[S]): RList[S] = {
+      if (acc.isEmpty || ordering.lteq(element, acc.head)) remaining.reverse ++ (element :: acc)
+      else insertSorted(element, acc.head :: remaining, acc.tail)
+    }
+
+    @tailrec
+    def sortedTailRec(remaining: RList[T], acc: RList[S]): RList[S] = {
+      if (remaining.isEmpty) acc
+      else sortedTailRec(remaining.tail, insertSorted(remaining.head, RNil, acc))
+
+    }
+    sortedTailRec(this, RNil)
+  }
+
 }
 
 object ListProblems extends App {
@@ -297,6 +318,10 @@ object ListProblems extends App {
   println("sample:")
   println(aSmallList.sample(3))
 
+  println("sorted:")
+  println((1 :: RNil).sorted(Ordering.fromLessThan[Int](_ < _)))
+  println((2 :: 1 :: RNil).sorted(Ordering.fromLessThan[Int](_ < _)))
+  println((2 :: 3 :: 4 :: 1 :: RNil).sorted(Ordering.fromLessThan[Int](_ < _)))
 
 
 }
