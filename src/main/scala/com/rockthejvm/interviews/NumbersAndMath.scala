@@ -112,4 +112,20 @@ object NumbersAndMath extends App {
   println(parse(" +100"))
   println(parse(" +999999999999999999999"))
   println(parse(" -999999999999999999999"))
+
+  def largestNumber(numbers: List[Int]): String = {
+    @tailrec
+        def largest(a: String, b: String): Boolean = {
+          if (a.isEmpty) true
+          else if(b.isEmpty) false
+          else if (a.head.toInt > b.head.toInt) true
+          else if (a.head.toInt < b.head.toInt) false
+          else largest(a.tail, b.tail)
+        }
+
+    numbers.map(_.toString).sortWith(largest).mkString
+  }
+
+  println(largestNumber(List(903, 925))) // 925903
+  println(largestNumber(List(1, 2, 9, 99, 3))) // 925903
 }
