@@ -129,4 +129,16 @@ object NumbersAndMath extends App {
 
   println(largestNumber(List(903, 925))) // 925903
   println(largestNumber(List(1, 2, 9, 99, 3))) // 925903
+
+  def reverseInteger(number: Int): Int = {
+    @tailrec
+    def reverse(s: String, acc: String): Int = {
+      if (s.isEmpty) acc.toInt
+      else reverse(s.tail, s.head + acc)
+    }
+
+    reverse(number.toString, "")
+  }
+
+  println(reverseInteger(123))
 }
