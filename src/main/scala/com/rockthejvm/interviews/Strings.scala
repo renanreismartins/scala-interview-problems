@@ -32,4 +32,36 @@ object Strings extends App {
 
   println("checkAnagrams")
   println(checkAnagram("desserts", "stressed"))
+
+  def hasValidParentheses(sentence: String): Boolean = {
+    @tailrec
+    def hasValidParenthesesTr(s: String, counter: Int): Boolean = {
+      if (counter < 0) false
+      else if (s.isEmpty && counter == 0) true
+      else if (s.isEmpty && counter > 0) false
+      else hasValidParenthesesTr(s.tail, if (s.head == '(') counter + 1 else counter - 1)
+    }
+
+    hasValidParenthesesTr(sentence, 0)
+  }
+
+  println("hasValidParentheses")
+  println(hasValidParentheses(""))
+  println(hasValidParentheses("()"))
+  println(hasValidParentheses("(())"))
+  println()
+  println(hasValidParentheses("("))
+  println(hasValidParentheses(")"))
+  println(hasValidParentheses(")("))
+  println(hasValidParentheses("())("))
+
+
+  def generateValidParentheses(n: Int): List[String] = {
+
+    def generateTr(n: Int, acc: List[String]): List[String] = {
+      if (n == 0) acc
+      else if
+    }
+    ???
+  }
 }
