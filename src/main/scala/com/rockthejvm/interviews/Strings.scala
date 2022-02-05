@@ -68,38 +68,44 @@ object Strings extends App {
   [[2,1,3], [2,3,1]]
 
   */
-    def generatePermutations(l: List[Int]): List[List[Int]] = l match {
-      case List() => {
-        println("nil")
-        Nil
-      }
-      case List(a) => { println("a=" + a); List(List(a))}
-      case List(a, b) => {println("final a= " + a + " b=" + b); List(List(a, b), List(b, a))}
+  def generatePermutations(l: List[Int]): List[List[Int]] = l match {
+    case List() => {
+      println("nil")
+      Nil
+    }
+    case List(a) => {
+      println("a=" + a);
+      List(List(a))
+    }
+    case List(a, b) => {
+      println("final a= " + a + " b=" + b);
+      List(List(a, b), List(b, a))
+    }
 
-      case _ => (for (i <- l.indices.toList) yield {
-        println("l(i)= " + l(i))
-        println("list= " + l)
-        println("remaining= " + (l.take(i) ++ l.drop(i + 1)))
+    case _ => (for (i <- l.indices.toList) yield {
+      println("l(i)= " + l(i))
+      println("list= " + l)
+      println("remaining= " + (l.take(i) ++ l.drop(i + 1)))
 
-        println()
-        println("recur")
-        println()
+      println()
+      println("recur")
+      println()
 
-        generatePermutations(l.take(i) ++ l.drop(i + 1)).map(xs =>  l(i) :: xs)
-      }).flatten
+      generatePermutations(l.take(i) ++ l.drop(i + 1)).map(xs => l(i) :: xs)
+    }).flatten
   }
 
   println("generateCombinations")
   println(generatePermutations(List(1)))
-//  println(generatePermutations(List(1, 2)))
+  //  println(generatePermutations(List(1, 2)))
   println(generatePermutations(List()))
-//  println(generatePermutations(List(1, 2, 3, 4)))
+  //  println(generatePermutations(List(1, 2, 3, 4)))
 
 
   def generatePermutations2(l: List[Int]): List[List[Int]] = {
     def go(total: Int, n: Int, acc: List[List[Int]]): List[Int] = {
       if (n == total) acc.flatten
-      else go(total, n + 1, generatePermutations2(l.take(n) ++ l.drop(n + 1)).map(xs =>  l(n) :: xs))
+      else go(total, n + 1, generatePermutations2(l.take(n) ++ l.drop(n + 1)).map(xs => l(n) :: xs))
     }
 
     l match {
@@ -107,9 +113,9 @@ object Strings extends App {
       case List(a) => List(List(a))
       case List(a, b) => List(List(a, b), List(b, a))
       case _ => List(go(l.indices.length, 0, List(List())))
-//      case _ => (for (i <- l.indices.toList) yield {
-//        generatePermutations2(l.take(i) ++ l.drop(i + 1)).map(xs =>  l(i) :: xs)
-//      }).flatten
+      //      case _ => (for (i <- l.indices.toList) yield {
+      //        generatePermutations2(l.take(i) ++ l.drop(i + 1)).map(xs =>  l(i) :: xs)
+      //      }).flatten
     }
   }
 
@@ -120,29 +126,30 @@ object Strings extends App {
   println(generatePermutations2(List(1, 2, 3)))
 
 
-  def generateX(l: List[String], acc: List[String], result: List[List[String]]): List[List[String]] = {
-    if (l.isEmpty) acc :: result
-    else if (l.size == 1) (l.head :: acc) :: result
-    else {
-      for (i <- l.indices.toList) yield {
-        generateX(l.take(i) ++ l.drop(i + 1), acc, result).map(xs => l(i) :: xs)
+  def generateValidParentheses(n: Int): List[String] = {
+
+    def gen(n: Int, combinations: List[String]): List[String] = {
+      if (n == 1) combinations
+      else {
+        val newCombinations = combinations.map(c => {
+          for {
+            index <- 0 until c.length
+          } yield {
+            val (before, after) = c.splitAt(index)
+            s"$before()$after"
+          }
+        }).flatten
+
+        gen(n - 1, newCombinations)
       }
-    }.flatten
+    }
+
+    gen(n, List("()"))
   }
 
-  println("3rd gen")
-  println(generateX(List("1", "2", "3"), List(), List()))
+  println("generateValidParentheses")
+//    println(generateValidParentheses(1))
+  println(generateValidParentheses(2))
+  println(generateValidParentheses(3))
 
-
-
-
-//
-//  def generateValidParentheses(n: Int): List[String] = {
-//
-//    def generateTr(n: Int, acc: List[String]): List[String] = {
-//      if (n == 0) acc
-//      else if
-//    }
-//    ???
-//  }
 }
