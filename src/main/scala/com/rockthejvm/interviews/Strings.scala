@@ -125,7 +125,6 @@ object Strings extends App {
   println(generatePermutations2(List(1, 2)))
   println(generatePermutations2(List(1, 2, 3)))
 
-
   def generateValidParentheses(n: Int): List[String] = {
 
     def gen(n: Int, combinations: List[String]): List[String] = {
@@ -152,4 +151,31 @@ object Strings extends App {
   println(generateValidParentheses(2))
   println(generateValidParentheses(3))
 
+
+  def ransomNote(note: String, magazine: String): Boolean = {
+    def tr(remainingNote: String, remainingMagazine: String): Boolean = {
+      if (remainingNote.isEmpty) true
+      else if (remainingMagazine.isEmpty) false
+      else {
+        val idx = indexOf(remainingNote.head, magazine, 0)
+        if (idx == -1) false
+        else tr(remainingNote.tail, remainingMagazine.take(idx) + remainingMagazine.drop(idx + 1))
+      }
+    }
+
+    def indexOf(c: Char, sentence: String, count: Int): Int = {
+      if (sentence.isEmpty) -1
+      else if (c == sentence.head) count
+      else indexOf(c, sentence.tail, count + 1)
+    }
+
+    tr(note, magazine)
+  }
+
+  println("ransomNote")
+  println(ransomNote("renan", "renan"))
+  println(ransomNote("renan", "rrenan"))
+  println(ransomNote("renan", "nrena"))
+  println(ransomNote("renan", "r"))
+  println(ransomNote("renan", "123"))
 }
