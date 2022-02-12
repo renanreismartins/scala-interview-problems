@@ -245,4 +245,21 @@ object Strings extends App {
   println("reog string")
   println(reorganizeString("aaabc"))
 
+
+  // could have dont split on empty spaces, filter, reverse
+  def reverseWords(s: String): String = {
+    def reverseTr(remaining: String, acc: String): String = {
+      val trimmed = remaining.trim
+      if (trimmed.isEmpty) acc.trim
+      else {
+        val word = trimmed.takeWhile(c => !c.isSpaceChar)
+        reverseTr(trimmed.drop(word.length), s"$word $acc")
+      }
+    }
+
+    reverseTr(s, "")
+  }
+
+  println("reverse words")
+  println(reverseWords("   renan    loves  scala   "))
 }
