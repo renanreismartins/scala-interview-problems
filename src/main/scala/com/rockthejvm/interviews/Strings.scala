@@ -153,6 +153,7 @@ object Strings extends App {
 
 
   def ransomNote(note: String, magazine: String): Boolean = {
+    @tailrec
     def tr(remainingNote: String, remainingMagazine: String): Boolean = {
       if (remainingNote.isEmpty) true
       else if (remainingMagazine.isEmpty) false
@@ -163,6 +164,7 @@ object Strings extends App {
       }
     }
 
+    @tailrec
     def indexOf(c: Char, sentence: String, count: Int): Int = {
       if (sentence.isEmpty) -1
       else if (c == sentence.head) count
@@ -178,4 +180,35 @@ object Strings extends App {
   println(ransomNote("renan", "nrena"))
   println(ransomNote("renan", "r"))
   println(ransomNote("renan", "123"))
+
+
+  def compareVersions(v1: String, v2: String): Int = {
+    @tailrec
+    def tr(sV1: List[String], sV2: List[String]): Int = {
+      if (sV1.isEmpty && sV2.isEmpty) 0
+      else if (sV1.isEmpty) if (sV2.exists(_.toInt != 0)) -1 else 0
+      else if (sV2.isEmpty) if (sV1.exists(_.toInt != 0)) 1 else 0
+      else if (sV2.isEmpty) 1
+      else if (sV1.head.toInt.compareTo(sV2.head.toInt) == 0) tr(sV1.tail, sV2.tail)
+      else sV1.head.toInt.compareTo(sV2.head.toInt)
+    }
+
+    val splitV1 = v1.split("\\.").toList
+    val splitV2 = v2.split("\\.").toList
+
+    tr(splitV1, splitV2)
+  }
+
+  println("compare versions")
+  println(compareVersions("0.9", "0.9"))
+  println(compareVersions("0.9", "1.0"))
+  println(compareVersions("0.9", "0.9.1"))
+  println(compareVersions("0.9", "0.9.0"))
+  println(compareVersions("1.0.3.4", "1.1.0"))
+  println(compareVersions("1.0", "1.0.0"))
+  println(compareVersions("1.0.0", "1.0"))
+  println(compareVersions("2.0", "1.0"))
+  println(compareVersions("1.0.1", "1.0"))
+
+  
 }
