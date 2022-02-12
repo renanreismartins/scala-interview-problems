@@ -147,7 +147,7 @@ object Strings extends App {
   }
 
   println("generateValidParentheses")
-//    println(generateValidParentheses(1))
+  //    println(generateValidParentheses(1))
   println(generateValidParentheses(2))
   println(generateValidParentheses(3))
 
@@ -210,5 +210,39 @@ object Strings extends App {
   println(compareVersions("2.0", "1.0"))
   println(compareVersions("1.0.1", "1.0"))
 
-  
+
+  // to it again with all possible strings to practice
+  def reorganizeString(s: String): String = {
+    def reorg(charC: Map[Char, Int], acc: String): String = {
+      if (charC.values.forall(v => v == 0)) acc
+      else {
+        val lastChar = acc.takeRight(1).charAt(0)
+        val (mKey, mValue) = charC.removed(lastChar).maxBy({
+          case (_, value) => value
+        })
+        reorg(charC.updated(mKey, mValue - 1), acc + mKey)
+      }
+    }
+
+    val charCount = s.groupBy(c => c)
+      .view
+      .mapValues(_.length)
+      .toMap
+
+    val charOccursTooMuch = charCount
+      .values
+      .exists(l => l > (s.length + 1) / 2)
+
+    if (charOccursTooMuch) ""
+    else {
+      val (mKey, mValue) = charCount.maxBy({
+        case (_, value) => value
+      })
+      reorg(charCount.updated(mKey, mValue - 1), mKey.toString)
+    }
+  }
+
+  println("reog string")
+  println(reorganizeString("aaabc"))
+
 }
