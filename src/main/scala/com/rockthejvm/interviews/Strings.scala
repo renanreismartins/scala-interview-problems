@@ -268,17 +268,36 @@ object Strings extends App {
 
 
   def justify(text: String, maxLineSize: Int): String = {
-    def packLine(words: List[String], currentLine: List[String], currentLineSize: Int, acc: List[List[String]]): List[List[String]] = {
+    def packLines(words: List[String], currentLine: List[String], currentLineSize: Int, acc: List[List[String]]): List[List[String]] = {
       if (words.isEmpty && currentLine.isEmpty) acc
-      else if (words.isEmpty) currentLine +: acc
-      else if (currentLineSize + words.head.size > maxLineSize) packLine(words, List(), 0,  currentLine +: acc)
-      else if (currentLineSize + words.head.size == maxLineSize) packLine(words.tail, List(), 0,  (currentLine :+ words.head) +: acc)
-      else packLine(words.tail, currentLine :+ words.head, currentLineSize + words.head.size + 1, acc)
+      else if (words.isEmpty) acc :+ currentLine
+      else if (currentLineSize + words.head.size > maxLineSize) packLines(words, List(), 0,  acc :+ currentLine)
+      else if (currentLineSize + words.head.size == maxLineSize) packLines(words.tail, List(), 0, acc :+ (currentLine :+ words.head))
+      else packLines(words.tail, currentLine :+ words.head, currentLineSize + words.head.size + 1, acc)
     }
 
-    packLine(text.split(" ").toList, List(), 0, List()).mkString(" ")
-  }
+    def makeSpace(n: Int): String = (1 to n).map(_ => " ").mkString
 
+    def justifyLine(line: List[String]): String = {
+      if (line.size == 1) line.head
+      else {
+        val maxSpaces = maxLineSize - line.map(_.length).sum
+        val spacesPerInterval = makeSpace(maxSpaces / (line.size - 1))
+        val firstSpaces = makeSpace(maxSpaces % (line.size - 1))
+
+        val first = s"${line.head}$spacesPerInterval$firstSpaces"
+        val middle = line.tail.dropRight(1).map(l => s"$l$spacesPerInterval").mkString
+        val last = line.takeRight(1).mkString
+
+        s"$first$middle$last"
+      }
+    }
+
+    val packed: Seq[List[String]] = packLines(text.split(" ").toList, List(), 0, List())
+    packed.map(justifyLine).mkString("\n")
+  }
+////acc +: currentLine
+//  //acc : currentLine
   println("justify")
   println(justify("a", 5))
   println(justify("a b", 5))
@@ -287,5 +306,6 @@ object Strings extends App {
   println(justify("a bb ccc", 5))
   println(justify("12345", 5))
   println(justify("a bb cb", 5))
+  println(justify("re na loves scala", 6))
 
 }
