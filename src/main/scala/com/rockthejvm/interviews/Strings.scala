@@ -307,5 +307,6 @@ object Strings extends App {
   println(justify("12345", 5))
   println(justify("a bb cb", 5))
   println(justify("re na loves scala", 6))
+  println(justify("scala is the most amazing language you will ever write code on", 15))
 
 }
