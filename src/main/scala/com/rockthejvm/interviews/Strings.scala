@@ -262,4 +262,30 @@ object Strings extends App {
 
   println("reverse words")
   println(reverseWords("   renan    loves  scala   "))
+
+
+
+
+
+  def justify(text: String, maxLineSize: Int): String = {
+    def packLine(words: List[String], currentLine: List[String], currentLineSize: Int, acc: List[List[String]]): List[List[String]] = {
+      if (words.isEmpty && currentLine.isEmpty) acc
+      else if (words.isEmpty) currentLine +: acc
+      else if (currentLineSize + words.head.size > maxLineSize) packLine(words, List(), 0,  currentLine +: acc)
+      else if (currentLineSize + words.head.size == maxLineSize) packLine(words.tail, List(), 0,  (currentLine :+ words.head) +: acc)
+      else packLine(words.tail, currentLine :+ words.head, currentLineSize + words.head.size + 1, acc)
+    }
+
+    packLine(text.split(" ").toList, List(), 0, List()).mkString(" ")
+  }
+
+  println("justify")
+  println(justify("a", 5))
+  println(justify("a b", 5))
+  println(justify("a b c", 5))
+  println(justify("a b c d", 5))
+  println(justify("a bb ccc", 5))
+  println(justify("12345", 5))
+  println(justify("a bb cb", 5))
+
 }
