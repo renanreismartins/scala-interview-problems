@@ -66,7 +66,7 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
 
   override def collectNodes(n: Int): List[BTree[T]] = {
     if (n == 1) List(this)
-    else right.collectNodes(n - 1) ::: left.collectNodes(n - 1)
+    else left.collectNodes(n - 1) ::: right.collectNodes(n - 1)
   }
 
   override def collectNodesTailRec(n: Int): List[BTree[T]] = {
@@ -74,7 +74,14 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
       if (toVisit.isEmpty) toVisit
       else if (i == 1) toVisit
       else if (toVisit.head.isLeaf) tr(toVisit.tail, i)
-      else tr(toVisit.head.right :: toVisit.head.left :: toVisit.tail, i - 1)
+      else {
+        val levelNodes = toVisit.flatMap(n => List(n.left, n.right)).filter(n => !n.isEmpty)
+        //        val levelNodes = for {
+        //          node <- toVisit
+        //          child <- List(node.left, node.right) if !child.isEmpty
+        //        }
+          tr(levelNodes, i - 1)
+      }
     }
 
     tr(List(this), n)
@@ -107,4 +114,5 @@ object BTreeProblems extends App {
   println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).collectNodesTailRec(1))
   println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).collectNodesTailRec(2))
   println(BNode(3, BNode(1, BNode(4, BEmpty, BEmpty), BEmpty), BNode(2, BEmpty, BEmpty)).collectNodesTailRec(3))
+  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BNode(4, BEmpty, BEmpty)), BNode(5, BNode(6, BEmpty, BEmpty), BNode(7, BEmpty, BEmpty))).collectNodesTailRec(3))
 }
