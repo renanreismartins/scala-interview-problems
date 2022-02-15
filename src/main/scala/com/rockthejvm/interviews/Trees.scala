@@ -18,6 +18,8 @@ sealed abstract class BTree[+T] {
   def leafCount: Int
 
   val size: Int
+
+  def collectNodes(n: Int): List[BTree[T]]
 }
 
 case object BEmpty extends BTree[Nothing] {
@@ -36,6 +38,8 @@ case object BEmpty extends BTree[Nothing] {
   override def leafCount: Int = 0
 
   override val size: Int = 0
+
+  override def collectNodes(n: Int): List[BTree[Nothing]] = List.empty
 }
 
 case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T] {
@@ -44,8 +48,8 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
   override def isLeaf: Boolean = left.isEmpty && right.isEmpty
 
   override def collectLeaves: List[BTree[T]] = {
-      if (isLeaf) List(this)
-      else left.collectLeaves ::: right.collectLeaves
+    if (isLeaf) List(this)
+    else left.collectLeaves ::: right.collectLeaves
 
     // collect(3, ())
     //collect(1, ()) ::: collect(2, ())
@@ -55,6 +59,11 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
   override def leafCount: Int = collectLeaves.size
 
   override val size: Int = 1 + left.leafCount + right.leafCount
+
+  override def collectNodes(n: Int): List[BTree[T]] = {
+    if (n == 1) List(this)
+    else right.collectNodes(n - 1) ::: left.collectNodes(n - 1)
+  }
 }
 
 object BTreeProblems extends App {
@@ -72,4 +81,9 @@ object BTreeProblems extends App {
   println(BNode(3, BEmpty, BEmpty).collectLeaves)
   println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).collectLeaves)
   println(BNode(3, BNode(1, BNode(4, BEmpty, BEmpty), BNode(5, BEmpty, BEmpty)), BNode(2, BEmpty, BEmpty)).collectLeaves)
+
+  println("collect nodes")
+  println(BNode(3, BEmpty, BEmpty).collectNodes(1))
+  println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).collectNodes(1))
+  println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).collectNodes(2))
 }
