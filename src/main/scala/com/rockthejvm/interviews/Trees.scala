@@ -22,6 +22,8 @@ sealed abstract class BTree[+T] {
   def collectNodes(n: Int): List[BTree[T]]
 
   def collectNodesTailRec(n: Int): List[BTree[T]]
+
+  def mirror: BTree[T]
 }
 
 case object BEmpty extends BTree[Nothing] {
@@ -44,6 +46,8 @@ case object BEmpty extends BTree[Nothing] {
   override def collectNodes(n: Int): List[BTree[Nothing]] = List.empty
 
   override def collectNodesTailRec(n: Int): List[BTree[Nothing]] = List.empty
+
+  override def mirror: BTree[Nothing] = BEmpty
 }
 
 case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T] {
@@ -79,12 +83,17 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
         //          node <- toVisit
         //          child <- List(node.left, node.right) if !child.isEmpty
         //        }
-          tr(levelNodes, i - 1)
+        tr(levelNodes, i - 1)
       }
     }
 
     tr(List(this), n)
   }
+
+  override def mirror: BTree[T] =
+    if (isEmpty) BEmpty
+    else if (isLeaf) this
+    else BNode(value, right.mirror, left.mirror)
 }
 
 object BTreeProblems extends App {
@@ -114,4 +123,10 @@ object BTreeProblems extends App {
   println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).collectNodesTailRec(2))
   println(BNode(3, BNode(1, BNode(4, BEmpty, BEmpty), BEmpty), BNode(2, BEmpty, BEmpty)).collectNodesTailRec(3))
   println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BNode(4, BEmpty, BEmpty)), BNode(5, BNode(6, BEmpty, BEmpty), BNode(7, BEmpty, BEmpty))).collectNodesTailRec(3))
+
+  println("mirror")
+  println(BNode(3, BEmpty, BEmpty).mirror)
+  println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).mirror)
+  println(BNode(3, BNode(1, BNode(4, BEmpty, BEmpty), BEmpty), BNode(2, BEmpty, BEmpty)).mirror)
+  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BNode(4, BEmpty, BEmpty)), BNode(5, BNode(6, BEmpty, BEmpty), BNode(7, BEmpty, BEmpty))).mirror)
 }
