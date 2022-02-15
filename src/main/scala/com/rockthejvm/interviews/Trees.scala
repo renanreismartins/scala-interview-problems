@@ -73,7 +73,6 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
     def tr(toVisit: List[BTree[T]], i: Int): List[BTree[T]] = {
       if (toVisit.isEmpty) toVisit
       else if (i == 1) toVisit
-      else if (toVisit.head.isLeaf) tr(toVisit.tail, i)
       else {
         val levelNodes = toVisit.flatMap(n => List(n.left, n.right)).filter(n => !n.isEmpty)
         //        val levelNodes = for {
