@@ -16,6 +16,8 @@ sealed abstract class BTree[+T] {
   def collectLeaves: List[BTree[T]]
 
   def leafCount: Int
+
+  def size: Int
 }
 
 case object BEmpty extends BTree[Nothing] {
@@ -32,9 +34,11 @@ case object BEmpty extends BTree[Nothing] {
   override def collectLeaves: List[BTree[Nothing]] = List.empty
 
   override def leafCount: Int = 0
+
+  override def size: Int = 0
 }
 
-case class BNode[+T](val value: T, val left: BTree[T], val right: BTree[T]) extends BTree[T] {
+case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T] {
   override def isEmpty: Boolean = false
 
   override def isLeaf: Boolean = left.isEmpty && right.isEmpty
@@ -48,7 +52,9 @@ case class BNode[+T](val value: T, val left: BTree[T], val right: BTree[T]) exte
     //(collect(4, ()) ::: collect(5, ())) ::: collect(2, ()))
   }
 
-  override def leafCount: Int = 1 + left.leafCount + right.leafCount
+  override def leafCount: Int = collectLeaves.size
+
+  override def size: Int = 1 + left.leafCount + right.leafCount
 }
 
 object BTreeProblems extends App {
