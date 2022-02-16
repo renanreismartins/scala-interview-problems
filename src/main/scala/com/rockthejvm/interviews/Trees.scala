@@ -115,7 +115,7 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
   }
 
   override def sameShapeAs[S >: T](that: BTree[S]): Boolean = {
-    if ((left.isEmpty != that.left.isEmpty) || (right.isEmpty != that.right.isEmpty)) false
+    if ((left.isEmpty ^ that.left.isEmpty) || (right.isEmpty ^ that.right.isEmpty)) false
     else right.sameShapeAs(that.right) && left.sameShapeAs(that.left)
   }
 }
