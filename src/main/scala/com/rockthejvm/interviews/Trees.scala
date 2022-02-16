@@ -24,6 +24,10 @@ sealed abstract class BTree[+T] {
   def collectNodesTailRec(n: Int): List[BTree[T]]
 
   def mirror: BTree[T]
+
+  def mirrorTailRec: BTree[T]
+
+  def sameShapeAs[S >: T](that: BTree[S]): Boolean
 }
 
 case object BEmpty extends BTree[Nothing] {
@@ -48,6 +52,10 @@ case object BEmpty extends BTree[Nothing] {
   override def collectNodesTailRec(n: Int): List[BTree[Nothing]] = List.empty
 
   override def mirror: BTree[Nothing] = BEmpty
+
+  override def mirrorTailRec: BTree[Nothing] = BEmpty
+
+  override def sameShapeAs[S >: Nothing](that: BTree[S]): Boolean = that.isEmpty
 }
 
 case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T] {
@@ -94,6 +102,22 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
     if (isEmpty) BEmpty
     else if (isLeaf) this
     else BNode(value, right.mirror, left.mirror)
+
+  override def mirrorTailRec: BTree[T] = {
+    def tr(todo: List[BTree[T]], visited: Set[BTree[T]], acc: List[BTree[T]]): BTree[T] = {
+      if (todo.isEmpty) acc.head
+      else if (visited.contains(todo.head)) tr(todo.tail, visited, BNode(todo.head.value, acc.head, acc.tail.head) :: acc.drop(2))
+      else if (todo.head.isLeaf || todo.head.isLeaf) tr(todo.tail, visited, todo.head :: acc)
+      else tr(todo.head.left :: todo.head.right :: todo, visited + todo.head, acc)
+    }
+
+    tr(List(this), Set.empty, List.empty)
+  }
+
+  override def sameShapeAs[S >: T](that: BTree[S]): Boolean = {
+    if ((left.isEmpty != that.left.isEmpty) || (right.isEmpty != that.right.isEmpty)) false
+    else right.sameShapeAs(that.right) && left.sameShapeAs(that.left)
+  }
 }
 
 object BTreeProblems extends App {
@@ -129,4 +153,13 @@ object BTreeProblems extends App {
   println(BNode(3, BNode(1, BEmpty, BEmpty), BNode(2, BEmpty, BEmpty)).mirror)
   println(BNode(3, BNode(1, BNode(4, BEmpty, BEmpty), BEmpty), BNode(2, BEmpty, BEmpty)).mirror)
   println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BNode(4, BEmpty, BEmpty)), BNode(5, BNode(6, BEmpty, BEmpty), BNode(7, BEmpty, BEmpty))).mirror)
+
+  println("mirror TR")
+  //println(BNode(3, BEmpty, BEmpty).mirrorTailRec)
+  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty)).mirrorTailRec)
+
+  println("same shape")
+  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty)).sameShapeAs(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
+  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BNode(7, BEmpty, BEmpty))).sameShapeAs(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
+  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BNode(7, BEmpty, BEmpty))).sameShapeAs(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BNode(7, BEmpty, BEmpty), BEmpty))))
 }
