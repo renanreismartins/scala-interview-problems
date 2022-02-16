@@ -131,7 +131,8 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
         val t2 = toExpand2.head
 
         if (t1.isEmpty != t2.isEmpty) false
-        else if ((t1.left.isEmpty ^ t2.left.isEmpty) || (t1.right.isEmpty ^ t2.right.isEmpty)) false
+        //else if (t1.isLeaf != t2.isLeaf) false
+        //else if ((t1.left.isEmpty ^ t2.left.isEmpty) || (t1.right.isEmpty ^ t2.right.isEmpty)) false
         else {
           val expandedT1 = expand(toExpand1)
           val expandedT2 = expand(toExpand2)
@@ -190,12 +191,13 @@ object BTreeProblems extends App {
   println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BNode(7, BEmpty, BEmpty))).sameShapeAs(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BNode(7, BEmpty, BEmpty), BEmpty))))
 
   println("same shape TR")
-//  println(BEmpty.sameShapeAsTr(BEmpty))
-//  println(BEmpty.sameShapeAsTr(BNode(3, BEmpty, BEmpty)))
-//  println(BNode(3, BEmpty, BEmpty).sameShapeAsTr(BEmpty))
+  println(BEmpty.sameShapeAsTr(BEmpty))
+  println(BEmpty.sameShapeAsTr(BNode(3, BEmpty, BEmpty)))
+  println(BNode(3, BEmpty, BEmpty).sameShapeAsTr(BEmpty))
   println(BNode(3, BEmpty, BEmpty).sameShapeAsTr(BNode(3, BEmpty, BEmpty)))
-//  println(BNode(3, BNode(1, BNode(2, BEmpty, BEmpty), BEmpty), BEmpty).sameShapeAsTr(BNode(3, BNode(1, BEmpty, BNode(2, BEmpty, BEmpty)), BEmpty)))
-//  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty)).sameShapeAsTr(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
-//  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BNode(7, BEmpty, BEmpty))).sameShapeAsTr(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
-//  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BNode(7, BEmpty, BEmpty))).sameShapeAsTr(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BNode(7, BEmpty, BEmpty), BEmpty))))
+  println(BNode(3, BNode(1, BNode(2, BEmpty, BEmpty), BEmpty), BEmpty).sameShapeAsTr(BNode(3, BNode(1, BEmpty, BNode(2, BEmpty, BEmpty)), BEmpty)))
+  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty)).sameShapeAsTr(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
+  println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BNode(7, BEmpty, BEmpty))).sameShapeAsTr(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
+  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BNode(4, BEmpty, BNode(5, BEmpty, BEmpty))), BNode(6, BNode(7,BEmpty, BEmpty), BNode(8, BEmpty, BEmpty)))
+    .sameShapeAsTr(BNode(8, BNode(9, BNode(1, BEmpty, BEmpty), BNode(3, BEmpty, BNode(4, BEmpty, BEmpty))), BNode(2, BNode(2,BEmpty, BEmpty), BNode(7, BEmpty, BEmpty)))))
 }
