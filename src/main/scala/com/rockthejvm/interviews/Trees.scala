@@ -33,7 +33,7 @@ sealed abstract class BTree[+T] {
 
   def toListPreOrder: List[T]
 
-  def toListPreLevelTr: List[T]
+  def toListPreOrderTr: List[T]
 }
 
 case object BEmpty extends BTree[Nothing] {
@@ -67,7 +67,7 @@ case object BEmpty extends BTree[Nothing] {
 
   override def toListPreOrder: List[Nothing] = List()
 
-  override def toListPreLevelTr: List[Nothing] = List()
+  override def toListPreOrderTr: List[Nothing] = List()
 }
 
 case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T] {
@@ -160,7 +160,7 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
     else List(value) ::: left.toListPreOrder ::: right.toListPreOrder
   }
 
-  override def toListPreLevelTr: List[T] = {
+  override def toListPreOrderTr: List[T] = {
     def tr(toExpand: List[BTree[T]], acc: List[T]): List[T] = {
       if (toExpand.isEmpty) acc
       else {
@@ -249,8 +249,8 @@ object BTreeProblems extends App {
   )
 
   println("pre order tr")
-  println(BEmpty.toListPreLevelTr)
-  println(BNode(3, BEmpty, BEmpty).toListPreLevelTr)
-  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BEmpty), BNode(4, BEmpty, BEmpty)).toListPreLevelTr)
-  println(tree.toListPreLevelTr)
+  println(BEmpty.toListPreOrderTr)
+  println(BNode(3, BEmpty, BEmpty).toListPreOrderTr)
+  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BEmpty), BNode(4, BEmpty, BEmpty)).toListPreOrderTr)
+  println(tree.toListPreOrderTr)
 }
