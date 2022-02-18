@@ -28,7 +28,12 @@ sealed abstract class BTree[+T] {
   def mirrorTailRec: BTree[T]
 
   def sameShapeAs[S >: T](that: BTree[S]): Boolean
+
   def sameShapeAsTr[S >: T](that: BTree[S]): Boolean
+
+  def toListPreOrder: List[T]
+
+  def toListPreOrderTr: List[T]
 }
 
 case object BEmpty extends BTree[Nothing] {
@@ -59,6 +64,10 @@ case object BEmpty extends BTree[Nothing] {
   override def sameShapeAs[S >: Nothing](that: BTree[S]): Boolean = that.isEmpty
 
   override def sameShapeAsTr[S >: Nothing](that: BTree[S]): Boolean = that.isEmpty
+
+  override def toListPreOrder: List[Nothing] = List()
+
+  override def toListPreOrderTr: List[Nothing] = List()
 }
 
 case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T] {
@@ -90,10 +99,10 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
       else if (i == 1) toVisit
       else {
         val levelNodes = toVisit.flatMap(n => List(n.left, n.right)).filter(n => !n.isEmpty)
-        //        val levelNodes = for {
-        //          node <- toVisit
-        //          child <- List(node.left, node.right) if !child.isEmpty
-        //        }
+        //                val levelNodes = for {
+        //                  node <- toVisit
+        //                  child <- List(node.left, node.right) if !child.isEmpty
+        //                }
         tr(levelNodes, i - 1)
       }
     }
@@ -144,6 +153,27 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
     def expand(l: List[BTree[S]]): List[BTree[S]] = l.flatMap(e => List(e.left, e.right)).filter(c => !c.isEmpty)
 
     tr(List(this), List(that))
+  }
+
+  override def toListPreOrder: List[T] = {
+    if (isEmpty) List()
+    else List(value) ::: left.toListPreOrder ::: right.toListPreOrder
+  }
+
+  override def toListPreOrderTr: List[T] = {
+    def tr(toExpand: List[BTree[T]], acc: List[T]): List[T] = {
+      if (toExpand.isEmpty) acc
+      else {
+        val expanded = for {
+          current <- toExpand
+          child <- List(current.left, current.right) if !child.isEmpty
+        } yield child
+
+        tr(expanded ::: toExpand.tail, acc ::: List(toExpand.head.value))
+      }
+    }
+
+    tr(List(this), List())
   }
 }
 
@@ -198,6 +228,16 @@ object BTreeProblems extends App {
   println(BNode(3, BNode(1, BNode(2, BEmpty, BEmpty), BEmpty), BEmpty).sameShapeAsTr(BNode(3, BNode(1, BEmpty, BNode(2, BEmpty, BEmpty)), BEmpty)))
   println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty)).sameShapeAsTr(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
   println(BNode(1, BNode(2, BEmpty, BEmpty), BNode(6, BEmpty, BNode(7, BEmpty, BEmpty))).sameShapeAsTr(BNode(1, BNode(0, BEmpty, BEmpty), BNode(6, BEmpty, BEmpty))))
-  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BNode(4, BEmpty, BNode(5, BEmpty, BEmpty))), BNode(6, BNode(7,BEmpty, BEmpty), BNode(8, BEmpty, BEmpty)))
-    .sameShapeAsTr(BNode(8, BNode(9, BNode(1, BEmpty, BEmpty), BNode(3, BEmpty, BNode(4, BEmpty, BEmpty))), BNode(2, BNode(2,BEmpty, BEmpty), BNode(7, BEmpty, BEmpty)))))
+  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BNode(4, BEmpty, BNode(5, BEmpty, BEmpty))), BNode(6, BNode(7, BEmpty, BEmpty), BNode(8, BEmpty, BEmpty)))
+    .sameShapeAsTr(BNode(8, BNode(9, BNode(1, BEmpty, BEmpty), BNode(3, BEmpty, BNode(4, BEmpty, BEmpty))), BNode(2, BNode(2, BEmpty, BEmpty), BNode(7, BEmpty, BEmpty)))))
+
+  println("pre order non tr")
+  println(BEmpty.toListPreOrder)
+  println(BNode(3, BEmpty, BEmpty).toListPreOrder)
+  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BEmpty), BNode(4, BEmpty, BEmpty)).toListPreOrder)
+
+  println("pre order tr")
+  println(BEmpty.toListPreOrderTr)
+  println(BNode(3, BEmpty, BEmpty).toListPreOrderTr)
+  println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BEmpty), BNode(4, BEmpty, BEmpty)).toListPreOrderTr)
 }
