@@ -164,12 +164,9 @@ case class BNode[+T](value: T, left: BTree[T], right: BTree[T]) extends BTree[T]
     def tr(toExpand: List[BTree[T]], acc: List[T]): List[T] = {
       if (toExpand.isEmpty) acc
       else {
-        val expanded = for {
-          current <- toExpand
-          child <- List(current.left, current.right) if !child.isEmpty
-        } yield child
+        val expanded = List(toExpand.head.left, toExpand.head.right).filter(!_.isEmpty)
 
-        tr(expanded ::: toExpand.tail, acc ::: List(toExpand.head.value))
+        tr(expanded ++ toExpand.tail, acc ++ List(toExpand.head.value))
       }
     }
 
@@ -236,8 +233,24 @@ object BTreeProblems extends App {
   println(BNode(3, BEmpty, BEmpty).toListPreOrder)
   println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BEmpty), BNode(4, BEmpty, BEmpty)).toListPreOrder)
 
+
+  val tree = BNode(1,
+    BNode(2,
+      BNode(3, BEmpty, BEmpty),
+      BNode(4,
+        BEmpty,
+        BNode(5, BEmpty, BEmpty),
+      )
+    ),
+    BNode(6,
+      BNode(7, BEmpty, BEmpty),
+      BNode(8, BEmpty, BEmpty)
+    )
+  )
+  
   println("pre order tr")
   println(BEmpty.toListPreOrderTr)
   println(BNode(3, BEmpty, BEmpty).toListPreOrderTr)
   println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BEmpty), BNode(4, BEmpty, BEmpty)).toListPreOrderTr)
+  println(tree.toListPreOrderTr)
 }
