@@ -18,10 +18,26 @@ object Graph extends App {
     case (_, friends) => friends.contains(node)
   }
 
+  def isPath[T](graph: Graph[T], start: T, end: T): Boolean = {
+    def isPathAux(toVisit: Set[T], visited: Set[T]): Boolean =
+      if (toVisit.isEmpty) false
+      else if (toVisit.contains(end)) true
+      else toVisit.exists(t => {
+        if (visited.contains(t)) false
+        else isPathAux(graph.getOrElse(t, Set()), visited + t)
+      })
+
+    isPathAux(graph.getOrElse(start, Set()), Set())
+  }
+
   println("outDegree")
   println(outDegree(socialNetwork, "Alice"))
   println()
   println("inDegree")
   println(inDegree(socialNetwork, "David"))
+  println()
+  println("inDegree")
+  println(isPath(socialNetwork, "Alice", "Mary"))
+  println(isPath(socialNetwork, "David", "Alice"))
 
 }
