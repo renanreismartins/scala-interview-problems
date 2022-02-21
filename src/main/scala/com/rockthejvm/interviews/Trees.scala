@@ -253,4 +253,17 @@ object BTreeProblems extends App {
   println(BNode(3, BEmpty, BEmpty).toListPreOrderTr)
   println(BNode(1, BNode(2, BNode(3, BEmpty, BEmpty), BEmpty), BNode(4, BEmpty, BEmpty)).toListPreOrderTr)
   println(tree.toListPreOrderTr)
+
+  def hasPathSum(tree: BTree[Int], target: Int): Boolean = {
+    if (tree.isEmpty) false
+    else if (tree.isLeaf && (target - tree.value) == 0) true
+    else hasPathSum(tree.left, target - tree.value) || hasPathSum(tree.right, target - tree.value)
+  }
+
+  println()
+  println()
+  println("pre order tr")
+  println(hasPathSum(BEmpty, 3))
+  println(hasPathSum(BNode(3, BEmpty, BEmpty), 3))
+  println(hasPathSum(tree, 12))
 }
