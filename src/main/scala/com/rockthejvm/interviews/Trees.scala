@@ -262,8 +262,27 @@ object BTreeProblems extends App {
 
   println()
   println()
-  println("pre order tr")
+  println("hasPathSum")
   println(hasPathSum(BEmpty, 3))
   println(hasPathSum(BNode(3, BEmpty, BEmpty), 3))
   println(hasPathSum(tree, 12))
+
+
+  def findSumPaths(tree: BTree[Int], target: Int): List[List[Int]] = {
+    if (tree.isEmpty) List()
+    else if (tree.isLeaf && (target - tree.value) == 0) List(List(tree.value))
+    else {
+      List(tree.left, tree.right).filter(!_.isEmpty).flatMap { node =>
+        findSumPaths(node, target - tree.value).map(l => tree.value :: l)
+      }
+    }
+  }
+
+  println()
+  println()
+  println("findSumPaths")
+  println(findSumPaths(BEmpty, 3))
+  println(findSumPaths(BNode(3, BEmpty, BEmpty), 3))
+  println(findSumPaths(tree, 6))
+  println(findSumPaths(tree, 12))
 }
