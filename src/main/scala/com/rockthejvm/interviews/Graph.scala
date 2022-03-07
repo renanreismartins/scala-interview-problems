@@ -11,7 +11,7 @@ object Graph extends App {
     "Charlie" -> Set("David"),
     "David" -> Set("Bob", "Mary"),
     "Mary" -> Set("Bob", "Charlie")
-//    "Mary" -> Set("Bob", "Charlie", "Alice")
+    //    "Mary" -> Set("Bob", "Charlie", "Alice")
   )
 
   def outDegree[T](graph: Graph[T], node: T): Int = graph.getOrElse(node, Set()).size
@@ -47,6 +47,19 @@ object Graph extends App {
     isPathTRAux(graph.getOrElse(start, Set()), Set())
   }
 
+  def findPathTr[T](graph: Graph[T], start: T, end: T): List[T] = {
+    @tailrec
+    def findPathTrAux(toVisit: List[T], visited: Set[T], acc: List[T]): List[T] =
+      if (toVisit.isEmpty) List()
+      else if (toVisit.head == end) acc :+ toVisit.head
+      else {
+        if (visited.contains(toVisit.head)) findPathTrAux(toVisit.tail, visited + toVisit.head, acc)
+        else findPathTrAux(toVisit.tail ++ graph.getOrElse(toVisit.head, List()), visited + toVisit.head, if (graph.getOrElse(toVisit.head, List()).isEmpty) acc else acc :+ toVisit.head)
+      }
+
+    findPathTrAux(List(start), Set(), List())
+  }
+
   println("outDegree")
   println(outDegree(socialNetwork, "Alice"))
 
@@ -65,4 +78,9 @@ object Graph extends App {
   println(isPathTR(socialNetwork, "David", "Alice"))
   println(isPathTR(socialNetwork, "Bob", "Charlie"))
 
+
+  println("findPathTr")
+  println(findPathTr(socialNetwork, "Alice", "Mary"))
+  println(findPathTr(socialNetwork, "David", "Alice"))
+  println(findPathTr(socialNetwork, "Bob", "Charlie"))
 }
